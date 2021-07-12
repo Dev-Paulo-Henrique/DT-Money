@@ -5,18 +5,18 @@ import { App } from './App';
 
 createServer({
   models: {
-    transition: Model
+    transaction: Model
   },
 
   seeds(server){
     server.db.loadData({
-      transitions: [
+      transactions: [
         {
           id: 1,
           title: 'Freelance de Website',
           type: 'deposit',
           category: 'Dev',
-          amount: 600,
+          amount: 1000000,
           createdAt: new Date('2021-07-09 16:00:00')
         },
         {
