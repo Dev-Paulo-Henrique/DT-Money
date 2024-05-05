@@ -1,33 +1,43 @@
-import styled from "styled-components";
+import styled, { css } from 'styled-components'
 
-export const Container = styled.div`
+export const SummaryContainer = styled.section`
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  margin-top: -10rem;
 
-  div{
-    background: var(--shape);
-    padding: 1.5rem 2rem;
-    color: var(--text-title);
+  margin-top: -5rem;
+`
 
-    header{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+interface SummaryCardProps {
+  variant?: 'green'
+}
 
-    strong {
-      display: block;
-      margin-top: 1rem;
-      font-size: 2rem;
-      font-weight: 500;
-      line-height: 3rem;
-    }
+export const SummaryCard = styled.div<SummaryCardProps>`
+  background: ${(props) => props.theme['gray-600']};
+  border-radius: 6px;
+  padding: 2rem;
 
-    &.highLight-background {
-      background: var(--green);
-      color: #fff;
-    }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: ${(props) => props.theme['gray-300']};
   }
+
+  strong {
+    display: block;
+    margin-top: 1rem;
+    font-size: 2rem;
+  }
+
+  ${(props) =>
+    props.variant === 'green' &&
+    css`
+      background: ${props.theme['green-700']};
+    `}
 `

@@ -1,33 +1,17 @@
-import { Header } from './components/Header'
+import { ThemeProvider } from 'styled-components'
+import { TransactionsProvider } from './contexts/TransactionsContext'
+import { Transactions } from './pages/Transactions'
 import { GlobalStyle } from './styles/global'
-import { Dashboard } from './components/Dashboard'
-import Modal from 'react-modal'
-import { useState } from 'react'
-import { NewTransactionModal } from './components/NewTransactionModal'
-import {  TransactionsProvider } from './hooks/useTransactions'
-
-Modal.setAppElement('#root')
+import { defaultTheme } from './styles/themes/default'
 
 export function App() {
-  const [ isNewTransactionModalOpen, setIsNewTransactionModalOpen ] = useState(false)
-
-  function handleOpenNewTransactionModal() {
-    setIsNewTransactionModalOpen(true)
-  }
-
-  function handleCloseNewTransactionModal() {
-    setIsNewTransactionModalOpen(false)
-  }
-
   return (
-    <TransactionsProvider>
-      <Header onOpenNewTransactionModal={handleOpenNewTransactionModal}/>
-      <Dashboard/>
-      <NewTransactionModal
-      isOpen={isNewTransactionModalOpen}
-      onRequestClose={handleCloseNewTransactionModal}
-      />
-      <GlobalStyle/>
-    </TransactionsProvider>
-  );
+    <ThemeProvider theme={defaultTheme}>
+      <GlobalStyle />
+
+      <TransactionsProvider>
+        <Transactions />
+      </TransactionsProvider>
+    </ThemeProvider>
+  )
 }

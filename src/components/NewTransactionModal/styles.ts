@@ -1,91 +1,126 @@
 import styled from 'styled-components'
-import { darken, transparentize } from 'polished'
+import * as Dialog from '@radix-ui/react-dialog'
+import * as RadioGroup from '@radix-ui/react-radio-group'
 
-export const Container = styled.form`
-  h2{
-    color: var(--text-title);
-    font-size:1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  input{
-    width: 100%;
-    padding: 1.5rem;
-    height: 4rem;
-    border-radius: 0.25rem;
-    border: 1px solid #d7d7d7;
-    background: #e7e9ee;
-    font-weight: 400;
-    font-size:1rem;
-
-    &::placeholder{
-      color: var(--text-body);
-    }
-
-    & + input{
-      margin-top: 1rem;
-    }
-  }
-
-  button[type="submit"]{
-    width: 100%;
-    padding: 0 1.5rem;
-    height: 4rem;
-    background: var(--green);
-    color: #fff;
-    border-radius: 0.25rem;
-    border: 0;
-    font-size: 1rem;
-    margin-top: 1.5rem;
-    font-weight: 600;
-    transition: filter 0.2s;
-
-    &:hover{
-      filter: brightness(0.9)
-    }
-  }
+export const Overlay = styled(Dialog.Overlay)`
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
 `
 
-export const TransactionTypeContainer =  styled.div`
-  margin: 1rem 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-`
+export const Content = styled(Dialog.Content)`
+  min-width: 32rem;
+  border-radius: 6px;
+  padding: 2.5rem 3rem;
+  background: ${(props) => props.theme['gray-800']};
 
-type RadioBoxProps = {
-  isActive: boolean;
-  activeColor: 'green' | 'red';
-}
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
-const colors = {
-  green: '#33cc95',
-  red: '#e52e4d'
-}
+  form {
+    margin-top: 2rem;
 
-export  const RadioBox = styled.button<RadioBoxProps>`
-   height: 4rem;
-    border: 1px solid #d7d7d7;
-    border-radius: 0.25rem;
-    background: ${(props) =>  props.isActive ? transparentize(0.9, colors[props.activeColor]) : 'transparent'};
     display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color 0.2s;
+    flex-direction: column;
+    gap: 1rem;
 
-    &:hover{
-      border-color: ${darken(0.1, '#d7d7d7')}
+    input {
+      border-radius: 6px;
+      border: 0;
+      background: ${(props) => props.theme['gray-900']};
+      color: ${(props) => props.theme['gray-300']};
+      padding: 1rem;
+
+      &::placeholder {
+        color: ${(props) => props.theme['gray-500']};
+      }
     }
 
-    img{
-      height: 20px;
-      width: 20px;
-    }
+    button[type='submit'] {
+      height: 50px;
+      border: 0;
+      background: ${(props) => props.theme['green-500']};
+      color: ${(props) => props.theme.white};
+      font-weight: bold;
+      padding: 0 1.25rem;
+      border-radius: 6px;
+      margin-top: 1.25rem;
+      cursor: pointer;
 
-    span{
-      display: inline-block;
-      margin-left: 1rem;
-      font-size: 1rem;
-      color: var(--text-title);
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      &:not(:disabled):hover {
+        background: ${(props) => props.theme['green-700']};
+        transition: background-color 0.2s;
+      }
     }
+  }
+`
+
+export const CloseButton = styled(Dialog.Close)`
+  position: absolute;
+  background: transparent;
+  border: 0;
+  top: 1.5rem;
+  right: 1.5rem;
+  line-height: 0;
+  cursor: pointer;
+  color: ${(props) => props.theme['gray-500']};
+`
+
+export const TransactionType = styled(RadioGroup.Root)`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 0.5rem;
+`
+
+interface TransactionTypeButtonProps {
+  variant: 'income' | 'outcome'
+}
+
+export const TransactionTypeButton = styled(
+  RadioGroup.Item,
+)<TransactionTypeButtonProps>`
+  background: ${(props) => props.theme['gray-700']};
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 0;
+  color: ${(props) => props.theme['gray-300']};
+
+  svg {
+    color: ${(props) =>
+      props.variant === 'income'
+        ? props.theme['green-300']
+        : props.theme['red-300']};
+  }
+
+  &[data-state='unchecked']:hover {
+    transition: background-color 0.2s;
+    background: ${(props) => props.theme['gray-600']};
+  }
+
+  &[data-state='checked'] {
+    color: ${(props) => props.theme.white};
+    background: ${(props) =>
+      props.variant === 'income'
+        ? props.theme['green-500']
+        : props.theme['red-500']};
+
+    svg {
+      color: ${(props) => props.theme.white};
+    }
+  }
 `

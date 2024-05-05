@@ -1,99 +1,120 @@
-import Modal from 'react-modal'
-import { Container, TransactionTypeContainer, RadioBox } from './styles'
-import closeImg from '../../assets/close.svg'
-import incomeImg from '../../assets/income.svg'
-import outcomeImg from '../../assets/outcome.svg'
-import { FormEvent, useState } from 'react'
-import { useTransactions } from '../../hooks/useTransactions'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as Dialog from '@radix-ui/react-dialog'
+import { ArrowCircleDown, ArrowCircleUp, X } from 'phosphor-react'
+import { Controller, useForm } from 'react-hook-form'
+import { useContextSelector } from 'use-context-selector'
+import * as z from 'zod'
+import { TransactionsContext } from '../../contexts/TransactionsContext'
 
-type NewTransactionModalProps ={
-  isOpen: boolean;
-  onRequestClose: () => void
-}
+import {
+  CloseButton,
+  Content,
+  Overlay,
+  TransactionType,
+  TransactionTypeButton,
+} from './styles'
 
-export function NewTransactionModal({isOpen, onRequestClose}: NewTransactionModalProps){
-  const { createTransaction } = useTransactions()
-  
-  const [title, setTitle] = useState('')
-  const [amount, setAmount] = useState(0)
-  const [category, setCategory] = useState('')
-  const [type, setType] = useState('deposit')
+const newTransactionFormSchema = z.object({
+  description: z.string(),
+  price: z.number(),
+  category: z.string(),
+  type: z.enum(['income', 'outcome']),
+})
 
-  async function handleCreateNewTransaction(event: FormEvent){
-    event.preventDefault()
+type NewTransactionFormInputs = z.infer<typeof newTransactionFormSchema>
+
+export function NewTransactionModal() {
+  const createTransaction = useContextSelector(
+    TransactionsContext,
+    (context) => {
+      return context.createTransaction
+    },
+  )
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+    reset,
+  } = useForm<NewTransactionFormInputs>({
+    resolver: zodResolver(newTransactionFormSchema),
+    defaultValues: {
+      type: 'income',
+    },
+  })
+
+  async function handleCreateNewTransaction(data: NewTransactionFormInputs) {
+    const { description, price, category, type } = data
+
     await createTransaction({
-      title,
-      amount,
+      description,
+      price,
       category,
-      type
+      type,
     })
 
-    setTitle('')
-    setAmount(0)
-    setCategory('')
-    setType('deposit')
-    onRequestClose()
+    reset()
   }
 
   return (
-    <Modal 
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      overlayClassName="react-modal-overlay"
-      className="react-modal-content"
-      >
-        <button 
-        type="button" 
-        onClick={onRequestClose} 
-        className="react-modal-close"
-        >
-        <img src={closeImg} alt="Fechar modal" />
-        </button>
-        <Container onSubmit={handleCreateNewTransaction}>
-          <h2>Cadastrar transação</h2>
-          <input 
-          placeholder="TÍtulo"
-          value={title}
-          onChange={event => setTitle(event.target.value)}
+    <Dialog.Portal>
+      <Overlay />
+
+      <Content>
+        <Dialog.Title>Nova Transação</Dialog.Title>
+
+        <CloseButton>
+          <X size={24} />
+        </CloseButton>
+
+        <form onSubmit={handleSubmit(handleCreateNewTransaction)}>
+          <input
+            type="text"
+            placeholder="Descrição"
+            required
+            {...register('description')}
           />
-          <input 
-          type="number"
-          placeholder="Valor"
-          value={amount}
-          onChange={event => setAmount(Number(event.target.value))}
+          <input
+            type="number"
+            placeholder="Preço"
+            required
+            {...register('price', { valueAsNumber: true })}
+          />
+          <input
+            type="text"
+            placeholder="Categoria"
+            required
+            {...register('category')}
           />
 
-          <TransactionTypeContainer>
-            <RadioBox 
-            type="button"
-            onClick={() => {setType('deposit')}}
-            isActive={type === 'deposit'}
-            activeColor="green"
-            >
-              <img src={incomeImg} alt="Entrada"/>
-              <span>Entrada</span>
-            </RadioBox>
-            
-            <RadioBox 
-            type="button"
-            onClick={() => {setType('withdraw')}}
-            isActive={type === 'withdraw'}
-            activeColor="red"
-            >
-              <img src={outcomeImg} alt="Saída"/>
-              <span>Saída</span>
-            </RadioBox>
-          </TransactionTypeContainer>
-
-          <input 
-          placeholder="Categoria"
-          value={category}
-          onChange={event => setCategory(event.target.value)}
+          <Controller
+            control={control}
+            name="type"
+            render={({ field }) => {
+              return (
+                <TransactionType
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <TransactionTypeButton variant="income" value="income">
+                    <ArrowCircleUp size={24} />
+                    Entrada
+                  </TransactionTypeButton>
+                  <TransactionTypeButton variant="outcome" value="outcome">
+                    <ArrowCircleDown size={24} />
+                    Saída
+                  </TransactionTypeButton>
+                </TransactionType>
+              )
+            }}
           />
-          <button type="submit">
+
+          <button type="submit" disabled={isSubmitting}>
             Cadastrar
           </button>
-        </Container>
-      </Modal>
+        </form>
+      </Content>
+    </Dialog.Portal>
   )
 }
