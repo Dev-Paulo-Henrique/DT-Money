@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite & json-server server.json -p 3333 -w -d 500",
+    "start": "concurrently \"npm:dev\" \"npm:dev:server\"",
     "dev": "vite",
     "dev:server": "json-server server.json -p 3333 -w -d 500",
     "lint": "eslint src --ext .tsx,.ts",
