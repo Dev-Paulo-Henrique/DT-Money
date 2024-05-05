@@ -16,6 +16,10 @@ export function Transactions() {
     return context.transactions
   })
 
+  function isMobile() {
+    return window.innerWidth <= 767;
+  }
+
   return (
     <div>
       <Header />
@@ -37,9 +41,11 @@ export function Transactions() {
                     </PriceHighlight>
                   </td>
                   <td>{transaction.category}</td>
+                  {isMobile() ? null : (
                   <td>
                     {dateFormatter.format(new Date(transaction.createdAt))}
                   </td>
+                  )}
                 </tr>
               )
             })}
